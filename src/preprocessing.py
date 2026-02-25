@@ -45,4 +45,3 @@ def rename_files(path, sub_dirs):
             index += 1
 
 
-preprocess(os.path.join(Path.cwd(), 'data'))
