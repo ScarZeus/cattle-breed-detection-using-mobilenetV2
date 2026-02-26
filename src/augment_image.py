@@ -5,10 +5,7 @@ from tensorflow.keras import layers
 
 
 def get_data_augmentation():
-    """
-    Returns a Sequential data augmentation pipeline
-    suitable for cattle breed classification.
-    """
+    
     data_augmentation = tf.keras.Sequential([
         layers.RandomFlip("horizontal"),
         layers.RandomRotation(0.15),

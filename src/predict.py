@@ -5,8 +5,6 @@ import numpy as np
 
 def load_model_and_classes(model_path, dataset_path="data"):
     model = tf.keras.models.load_model(model_path)
-
-    # Get class names from dataset folder structure
     class_names = sorted(os.listdir(dataset_path))
     return model, class_names
 

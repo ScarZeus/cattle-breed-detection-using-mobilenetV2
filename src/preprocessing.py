@@ -4,7 +4,9 @@ from pathlib import Path
 def preprocess(path):
     sub_dirs = {
         "red_angus": "red_agnus",          
-        "belted_galloway": "belted_galloway"
+        "belted_galloway": "belted_galloway",
+        "jersey" : "jersey",
+        
     }
     rename_files(path, sub_dirs)
 

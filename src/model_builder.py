@@ -1,5 +1,3 @@
-# model_builder.py
-
 import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.applications import MobileNetV2
@@ -24,7 +22,6 @@ def build_model(num_classes,
     base_model.trainable = fine_tune
 
     if fine_tune:
-        # Unfreeze only last 20 layers
         for layer in base_model.layers[:-20]:
             layer.trainable = False
 
