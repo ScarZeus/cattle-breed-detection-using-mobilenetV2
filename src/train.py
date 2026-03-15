@@ -1,7 +1,7 @@
-# train.py
-
 import os
 import tensorflow as tf
+import numpy as np
+from sklearn.metrics import classification_report
 from src.model_builder import build_model
 from src.load_data import load_datasets
 
@@ -21,7 +21,9 @@ def train_model(dataset_path="data",
 
     num_classes = len(class_names)
 
-    # Resume training if checkpoint exists
+    print("Detected Classes:", class_names)
+    print("Total Classes:", num_classes)
+
     latest_checkpoint = tf.train.latest_checkpoint(model_dir)
 
     if latest_checkpoint:
@@ -30,22 +32,12 @@ def train_model(dataset_path="data",
     else:
         model = build_model(num_classes, fine_tune=fine_tune)
 
-    # Learning rate adjustment
     lr = 1e-5 if fine_tune else 1e-4
-
-    if num_classes == 2:
-        loss_fn = "binary_crossentropy"
-    else:
-        loss_fn = "sparse_categorical_crossentropy"
 
     model.compile(
         optimizer=tf.keras.optimizers.Adam(lr),
-        loss=loss_fn,
-        metrics=[
-            "accuracy",
-            tf.keras.metrics.Precision(name="precision"),
-            tf.keras.metrics.Recall(name="recall")
-        ]
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"]
     )
 
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -60,29 +52,26 @@ def train_model(dataset_path="data",
         save_best_only=True
     )
 
-    early_stop = tf.keras.callbacks.EarlyStopping(
-        monitor="val_loss",
-        patience=6,
-        restore_best_weights=True
-    )
-
-    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
-        monitor="val_loss",
-        factor=0.3,
-        patience=3
-    )
-
     history = model.fit(
         train_ds,
         validation_data=val_ds,
         epochs=epochs,
-        callbacks=[
-            checkpoint_callback,
-            best_model_callback,
-            early_stop,
-            reduce_lr
-        ]
+        callbacks=[checkpoint_callback, best_model_callback]
     )
+
+    # -------- Evaluate metrics on validation set --------
+    y_true = []
+    y_pred = []
+
+    for images, labels in val_ds:
+        preds = model.predict(images, verbose=0)
+        preds = np.argmax(preds, axis=1)
+
+        y_pred.extend(preds)
+        y_true.extend(labels.numpy())
+
+    print("\n===== Classification Report =====")
+    print(classification_report(y_true, y_pred, target_names=class_names))
 
     model.save(os.path.join(model_dir, "final_model.keras"))
 

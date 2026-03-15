@@ -6,6 +6,8 @@ def preprocess(path):
         "red_angus": "red_agnus",          
         "belted_galloway": "belted_galloway",
         "jersey" : "jersey",
+        "gir" : "gir",
+        "aberdeen_angus": "aberdeen_angus"
         
     }
     rename_files(path, sub_dirs)
